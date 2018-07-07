@@ -1,0 +1,10 @@
+﻿{
+  "Name": "MultitoolMod",
+  "Author": "Miome",
+  "Version": "1.0.0",
+  "Description": "A tool for every profession",
+  "UniqueID": "miome.MutliToolMod",
+  "EntryDll": "MultitoolMod.dll",
+  "MinimumApiVersion": "2.0",
+  "UpdateKeys": []
+}
