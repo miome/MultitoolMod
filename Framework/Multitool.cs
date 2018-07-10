@@ -281,7 +281,7 @@ namespace MultitoolMod.Framework
                     }
                     else if (dirt.needsWatering())
                     {
-                        properties.Add("bool_needsWater", (System.Object)true);
+                        properties["bool_needsWater"]=(System.Object)true;
                         properties.Add("string_useTool", (System.Object)"wateringcan");
                     }
 
