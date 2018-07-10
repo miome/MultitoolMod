@@ -34,7 +34,6 @@
     <Compile Include="MultitoolMod.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="Framework\Multitool.cs" />
-    <Compile Include="Framework\PickaxeBlade.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
