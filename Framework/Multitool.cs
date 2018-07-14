@@ -96,6 +96,7 @@ namespace MultitoolMod.Framework
                             try
                             {
                                 dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, false, Game1.currentLocation);
+                                Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
                             } catch (Exception e){
                                 this.mod.Monitor.Log($"Exception in getting the dirt:{e}");
                             }
