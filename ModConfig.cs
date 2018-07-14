@@ -5,7 +5,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
-namespace MultiToolMod
+namespace MultitoolMod
 {
     class ModConfig
     {

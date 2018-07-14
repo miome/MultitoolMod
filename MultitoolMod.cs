@@ -16,7 +16,7 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 
 
-namespace MultiToolMod
+namespace MultitoolMod
 {
     /// <summary>The mod entry point.</summary>
     public class MultitoolMod : Mod
@@ -34,7 +34,7 @@ namespace MultiToolMod
         {
             InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
             this.Config = this.Helper.ReadConfig<ModConfig>();
-            this.multitool = new Multitool();
+            this.multitool = new Multitool(this);
         }
 
         /*********
