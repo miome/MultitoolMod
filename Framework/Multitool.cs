@@ -93,30 +93,17 @@ namespace MultitoolMod.Framework
                         if (Game1.player.CurrentItem != null)
                         {
                             HoeDirt dirt = (HoeDirt)properties["hoedirt_dirt"];
-                            try
+                            if (Game1.player.CurrentItem.Category == StardewValley.Object.SeedsCategory)
                             {
-                                if (dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, true, Game1.currentLocation))
-                                {
-                                    Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
-                                }
+                                dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, false, Game1.currentLocation);
+                                Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
                             }
-                            catch (System.NullReferenceException)
+                            else if (Game1.player.CurrentItem.Category == StardewValley.Object.fertilizerCategory)
                             {
-                                //Object wasn't fertilizer. Continue on to see if it's a seed ...
-                                try
-                                {
-                                    if (dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, false, Game1.currentLocation))
-                                    {
-                                        Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
-                                    }
-                                }
-                                catch (System.NullReferenceException)
-                                {
-                                    //Object wasn't a seed, either.  Do nothing
-                                }
+                                dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, true, Game1.currentLocation);
+                                Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
 
                             }
-
                         }
                         else
                         {
@@ -281,7 +268,10 @@ namespace MultitoolMod.Framework
             location.terrainFeatures.TryGetValue(tileVec, out TerrainFeature tileFeature);
             location.objects.TryGetValue(tileVec, out SObject tileObj);
             properties["object_tileObj"] = tileObj;
-            properties["type_tileObjType"] = (System.Object)tileObj.GetType();
+            if (tileObj != null)
+            {
+                properties["type_tileObjType"] = (System.Object)tileObj.GetType();
+            }
             properties["terrainFeature_tileFeature"] = tileFeature;
             ResourceClump clump = this.GetResourceClumpCoveringTile(location, tileVec);
 
@@ -344,7 +334,9 @@ namespace MultitoolMod.Framework
                 else if (tileObj is StardewValley.Objects.IndoorPot pot)
                 {
                     properties = Get_HoeDirtProperties(pot.hoeDirt, properties);
-                } else if (tileObj.ParentSheetIndex == 590 ) {
+                }
+                else if (tileObj.ParentSheetIndex == 590)
+                {
                     properties["bool_isArtifactSpot"] = (System.Object)true;
                     properties["string_useTool"] = (System.Object)"hoe";
                 }
