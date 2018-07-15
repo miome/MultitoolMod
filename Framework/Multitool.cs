@@ -371,6 +371,12 @@ namespace MultitoolMod.Framework
                     }
                 }
             }
+            if (tileObj == null && location.doesTileHaveProperty(xtile, ytile, "Water", "Back") != null)
+            {
+                properties["bool_isWater"] = (System.Object)true;
+                properties["string_useTool"] = (System.Object)"wateringcan";
+            }
+    
             return properties;
         }
 
