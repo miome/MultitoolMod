@@ -68,7 +68,7 @@ namespace MultitoolMod.Framework
 
         public override void DoFunction(GameLocation location, int x, int y, int power, Farmer who)
         {
-            /* TODO : Covert all try/catch to this:
+            /* TODO : Covert all try/catch on dictionary exceptions to this:
              * if (dictionary.TryGetValue(key, out string value))
              {
                  // do stuff with value
@@ -86,7 +86,7 @@ namespace MultitoolMod.Framework
 
                 if ((bool)properties["bool_canPlant"])
                 {
-//Dictionary<int, string> dictionary = Game1.content.Load<Dictionary<int, string>>("Data\\Crops");
+                    //Dictionary<int, string> dictionary = Game1.content.Load<Dictionary<int, string>>("Data\\Crops");
                     try
                     {
 
@@ -95,18 +95,35 @@ namespace MultitoolMod.Framework
                             HoeDirt dirt = (HoeDirt)properties["hoedirt_dirt"];
                             try
                             {
-                                dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, false, Game1.currentLocation);
-                                Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
-                            } catch (Exception e){
-                                this.mod.Monitor.Log($"Exception in getting the dirt:{e}");
+                                if (dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, true, Game1.currentLocation))
+                                {
+                                    Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
+                                }
                             }
+                            catch (System.NullReferenceException)
+                            {
+                                //Object wasn't fertilizer. Continue on to see if it's a seed ...
+                                try
+                                {
+                                    if (dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, false, Game1.currentLocation))
+                                    {
+                                        Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
+                                    }
+                                }
+                                catch (System.NullReferenceException)
+                                {
+                                    //Object wasn't a seed, either.  Do nothing
+                                }
+
+                            }
+
                         }
                         else
                         {
-                            //Game1.addHUDMessage(new HUDMessage($"No appropriate tool found, trying checkAction"));
                             location.checkAction(new Location(xtile, ytile), Game1.viewport, Game1.player);
                         }
-                    } catch (System.Collections.Generic.KeyNotFoundException)
+                    }
+                    catch (System.Collections.Generic.KeyNotFoundException)
                     {
                         Game1.addHUDMessage(new HUDMessage($"{Game1.player.CurrentItem} {Game1.player.CurrentItem.parentSheetIndex.Get()} 201"));
                         return;
@@ -140,10 +157,10 @@ namespace MultitoolMod.Framework
                 this.scythe.DoDamage(Game1.currentLocation, x, y, 0, power, who);
                 //this.scythe.DoFunction(location, x, y, power, who);
                 return;
-            } 
+            }
             else
             {
-                
+
                 tool.DoFunction(location, x, y, power, who);
                 return;
             }
@@ -154,8 +171,6 @@ namespace MultitoolMod.Framework
             foreach (Item item in Game1.player.Items)
             {
                 //Game1.addHUDMessage(new HUDMessage($"refresh found: {item.Name}"));
-                // TODO: This does not appear to be working - trees take more chope with MT 
-                // than by hand with axe.
                 if (item is Tool)
                 {
                     if (item is Pickaxe p)
@@ -191,13 +206,16 @@ namespace MultitoolMod.Framework
             }
         }
 
-        public void checkAction(GameLocation parentL, Location childL, xTile.Dimensions.Rectangle viewport , Farmer who){
+        public void checkAction(GameLocation parentL, Location childL, xTile.Dimensions.Rectangle viewport, Farmer who)
+        {
             // This method is inserted to deal with the case where a harvest produces an invalid item.
             // This is the statement that fails: int num7 = Convert.ToInt32 (Game1.objectInformation [this.indexOfHarvest].Split ('/') [1]);
             try
             {
                 parentL.checkAction(childL, viewport, who);
-            } catch(System.Collections.Generic.KeyNotFoundException e){
+            }
+            catch (System.Collections.Generic.KeyNotFoundException e)
+            {
                 this.mod.Monitor.Log("Error running checkAction, an item was not found in the Stardew dictionaries. " + System.Environment.NewLine +
                                     "This is most often seen when using items created with JsonAssets" + System.Environment.NewLine +
                                      "Multitool will attempt to delete the items from player inventory to avoid a crash. The original exception was:" + e);
@@ -205,26 +223,26 @@ namespace MultitoolMod.Framework
                 {
                     if (((NetList<Item, NetRef<Item>>)who.items)[i] != null)
                     {
-                        try {
+                        try
+                        {
                             string x = Game1.objectInformation[((NetList<Item, NetRef<Item>>)who.items)[i].ParentSheetIndex];
-                        } catch (System.Collections.Generic.KeyNotFoundException) {
+                        }
+                        catch (System.Collections.Generic.KeyNotFoundException)
+                        {
                             who.removeItemFromInventory(i);
                         }
 
                     }
                 }
-                
+
             }
 
-            
+
         }
 
 
         public IDictionary<string, System.Object> Get_Properties(int x, int y)
         {
-            //TODO: Identify worms(artifact spots)
-            //TODO: Initialize properties with all false values
-
             IDictionary<string, System.Object> properties = new Dictionary<string, System.Object>()
             {
                 {"ResourceClump_clump", null},
@@ -235,6 +253,7 @@ namespace MultitoolMod.Framework
                 {"bool_hasGrass", (System.Object)false},
                 {"bool_hasLiveCrop", (System.Object)false},
                 {"bool_hasTree", (System.Object)false},
+                {"bool_isArtifactSpot", (System.Object)false},
                 {"bool_isBoulder", (System.Object)false},
                 {"bool_isDirt", (System.Object)false},
                 {"bool_isHollowLog", (System.Object)false},
@@ -251,6 +270,7 @@ namespace MultitoolMod.Framework
                 {"string_terrainFeatureName",null},
                 {"string_tileObjName", null},
                 {"string_useTool", null},
+                {"type_tileObjType", null},
             };
 
             int xtile = (int)x / Game1.tileSize;
@@ -258,13 +278,10 @@ namespace MultitoolMod.Framework
             GameLocation location = Game1.player.currentLocation;
             Vector2 tileVec = new Vector2(xtile, ytile);
 
-            //This will be the return value for the function
-
-            properties["bool_canPlant"] = (System.Object)false;
-
             location.terrainFeatures.TryGetValue(tileVec, out TerrainFeature tileFeature);
             location.objects.TryGetValue(tileVec, out SObject tileObj);
             properties["object_tileObj"] = tileObj;
+            properties["type_tileObjType"] = (System.Object)tileObj.GetType();
             properties["terrainFeature_tileFeature"] = tileFeature;
             ResourceClump clump = this.GetResourceClumpCoveringTile(location, tileVec);
 
@@ -327,6 +344,9 @@ namespace MultitoolMod.Framework
                 else if (tileObj is StardewValley.Objects.IndoorPot pot)
                 {
                     properties = Get_HoeDirtProperties(pot.hoeDirt, properties);
+                } else if (tileObj.ParentSheetIndex == 590 ) {
+                    properties["bool_isArtifactSpot"] = (System.Object)true;
+                    properties["string_useTool"] = (System.Object)"hoe";
                 }
             }
             else if (tileObj == null && tileFeature != null)
