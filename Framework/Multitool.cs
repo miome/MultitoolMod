@@ -24,15 +24,12 @@ namespace MultitoolMod.Framework
 {
     public class Multitool : Tool
     {
-
         public Axe axe;
         public Pickaxe pickaxe;
         public MeleeWeapon scythe;
         public WateringCan wateringCan;
         public Hoe hoe;
-
         public IDictionary<string, Tool> attachedTools;
-
         public MultitoolMod mod;
 
         public Multitool(MultitoolMod m)
@@ -52,6 +49,7 @@ namespace MultitoolMod.Framework
             attachedTools["wateringcan"] = this.wateringCan;
             attachedTools["hoe"] = this.hoe;
         }
+
         public override Item getOne()
         {
             return new Multitool(null);
@@ -60,7 +58,6 @@ namespace MultitoolMod.Framework
         {
             return Game1.content.LoadString("A tool for all trades");
         }
-
         protected override string loadDescription()
         {
             return Game1.content.LoadString("A tool for all trades");
@@ -83,13 +80,10 @@ namespace MultitoolMod.Framework
             toolName = (string)properties["string_useTool"];
             if (toolName == null)
             {
-
                 if ((bool)properties["bool_canPlant"])
                 {
-                    //Dictionary<int, string> dictionary = Game1.content.Load<Dictionary<int, string>>("Data\\Crops");
                     try
                     {
-
                         if (Game1.player.CurrentItem != null)
                         {
                             HoeDirt dirt = (HoeDirt)properties["hoedirt_dirt"];
@@ -102,7 +96,6 @@ namespace MultitoolMod.Framework
                             {
                                 dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, true, Game1.currentLocation);
                                 Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
-
                             }
                         }
                         else
@@ -121,7 +114,6 @@ namespace MultitoolMod.Framework
             try
             {
                 tool = this.attachedTools[toolName];
-
             }
             catch (System.Collections.Generic.KeyNotFoundException)
             {
@@ -135,8 +127,6 @@ namespace MultitoolMod.Framework
                 }
                 return;
             }
-
-            //Game1.addHUDMessage(new HUDMessage($"{toolName}/{tool} selected with level {tool.upgradeLevel}"));
             if (toolName == "melee")
             {
                 //this.scythe.DoDamage(Game1.currentLocation, x, y, Game1.player.facingDirection, power, who);
@@ -147,7 +137,6 @@ namespace MultitoolMod.Framework
             }
             else
             {
-
                 tool.DoFunction(location, x, y, power, who);
                 return;
             }
@@ -157,37 +146,28 @@ namespace MultitoolMod.Framework
         {
             foreach (Item item in Game1.player.Items)
             {
-                //Game1.addHUDMessage(new HUDMessage($"refresh found: {item.Name}"));
                 if (item is Tool)
                 {
                     if (item is Pickaxe p)
                     {
-                        //this.pickaxe = p;
                         this.pickaxe.upgradeLevel.Set(p.upgradeLevel.Get());
-                        //Game1.addHUDMessage(new HUDMessage($"refresh pick: {item.Name}"));
                     }
                     else if (item is Axe a)
                     {
-                        //this.axe = a;
                         this.axe.upgradeLevel.Set(a.upgradeLevel.Get());
-                        //Game1.addHUDMessage(new HUDMessage($"refresh axe: {item.Name}"));
                     }
                     else if (item is WateringCan w)
                     {
-                        //this.wateringCan = w;
                         this.wateringCan.upgradeLevel.Set(w.upgradeLevel.Get());
-                        //Game1.addHUDMessage(new HUDMessage($"refresh wc: {item.Name}"));
+
                     }
                     else if (item is Hoe h)
                     {
-                        //this.hoe = h;
                         this.hoe.upgradeLevel.Set(h.upgradeLevel.Get());
-                        //Game1.addHUDMessage(new HUDMessage($"refresh hoe: {item.Name}"));
                     }
                     else if (((Tool)item).Name == "Scythe")
                     {
                         this.scythe = (MeleeWeapon)item;
-                        //Game1.addHUDMessage(new HUDMessage($"refresh scythe: {item.Name}"));
                     }
                 }
             }
@@ -197,6 +177,7 @@ namespace MultitoolMod.Framework
         {
             // This method is inserted to deal with the case where a harvest produces an invalid item.
             // This is the statement that fails: int num7 = Convert.ToInt32 (Game1.objectInformation [this.indexOfHarvest].Split ('/') [1]);
+            // WARNING: Untested, bug has not re-occurred yet
             try
             {
                 parentL.checkAction(childL, viewport, who);
@@ -218,13 +199,10 @@ namespace MultitoolMod.Framework
                         {
                             who.removeItemFromInventory(i);
                         }
-
                     }
                 }
 
             }
-
-
         }
 
 
@@ -380,9 +358,6 @@ namespace MultitoolMod.Framework
             return properties;
         }
 
-
-
-
         public IDictionary<string, System.Object> Get_HoeDirtProperties(HoeDirt dirt, IDictionary<string, System.Object> properties)
         {
             properties["hoedirt_dirt"] = dirt;
@@ -398,8 +373,6 @@ namespace MultitoolMod.Framework
                 {
                     properties["bool_hasLiveLCrop"] = (System.Object)true;
                     int harvestablePhase = dirt.crop.phaseDays.Count - 1;
-                    // bool canHarvestNow = (dirt.crop.currentPhase.Value >= harvestablePhase)
-                    //&& (!dirt.crop.fullyGrown.Value || dirt.crop.dayOfCurrentPhase.Value <= 0);
                     bool canHarvestNow = dirt.readyForHarvest();
                     properties["bool_fullyGrownCrop"] = (System.Object)canHarvestNow;
                     if (canHarvestNow)
@@ -418,8 +391,6 @@ namespace MultitoolMod.Framework
                         properties["bool_needsWater"] = (System.Object)true;
                         properties["string_useTool"] = (System.Object)"wateringcan";
                     }
-
-
                 }
             }
             else
@@ -451,7 +422,6 @@ namespace MultitoolMod.Framework
                 }
             }
             return formatted_output;
-
         }
         ///The functions below are taking directly from Tractor Mod by PathosChild
         /// https://github.com/Pathoschild/StardewMods/tree/develop/TractorMod
