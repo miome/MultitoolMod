@@ -433,6 +433,17 @@ namespace MultitoolMod.Framework
         }
         public string Format_Properties(IDictionary<string, System.Object> properties)
         {
+            /* 
+                TODO: HUDMessage to small for text!
+                Moo - Today at 6:59 AM
+                Game1.chatBox.addInfoMessage ?
+                Moo - Today at 7:03 AM
+                Or you could maybe do something like spriteBatch.DrawString in 
+                OnPostRenderHudEvent or something, to draw text directly on the 
+                screen, if you want a constant display of cursor info rather 
+                than something that appears when you press a key.
+                */
+
             string formatted_output = "";
             foreach (KeyValuePair<string, System.Object> kvp in properties)
             {
