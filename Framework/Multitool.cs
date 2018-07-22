@@ -168,7 +168,7 @@ namespace MultitoolMod.Framework
                 }
             }
         }
-
+        /*
         public void checkAction(GameLocation parentL, Location childL, xTile.Dimensions.Rectangle viewport, Farmer who)
         {
             // This method is inserted to deal with the case where a harvest produces an invalid item.
@@ -207,7 +207,7 @@ namespace MultitoolMod.Framework
                 }
             }
             this.mod.Monitor.Log($"{count} bad items found & removed", LogLevel.Warn);
-        }
+        } */
 
         public IDictionary<string, System.Object> Get_Properties(int x, int y)
         {

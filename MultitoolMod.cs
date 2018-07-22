@@ -68,9 +68,9 @@ namespace MultitoolMod
                 Vector2 tileVec = new Vector2(xtile, ytile);
                 multitool.DoFunction(Game1.currentLocation, x, y, powerupLevel, Game1.player);
             }
-            else if ( e.Button == this.Config.CleanButton ){
+            /* else if ( e.Button == this.Config.CleanButton ){
                 multitool.cleanInventory(Game1.player);
-            }
+            } */
         }
     }
 }
