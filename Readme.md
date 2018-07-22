@@ -18,4 +18,4 @@ Not yet tested in Multiplayer.
 
 ## See Also
    * The source code is hosted at [https://github.com/miome/MultitoolMod]
-   * Download from Nexus mods TODO
+   * Download from Nexus mods [https://www.nexusmods.com/stardewvalley/mods/2546/]
