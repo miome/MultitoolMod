@@ -54,12 +54,12 @@ namespace MultitoolMod
                 Vector2 tileVec = new Vector2(xtile, ytile);
                 IDictionary<String, System.Object> properties = multitool.Get_Properties(x, y);
                 string formattedProperties = multitool.Format_Properties(properties);
-                this.Monitor.Log($"{formattedProperties}");
+                this.Monitor.Log($"At {x}/{y} found the following properties: {formattedProperties}");
                 Game1.addHUDMessage(new HUDMessage(formattedProperties));
             }
             else if (e.Button == this.Config.ToolButton)
             {
-                int powerupLevel = 3; //(int)((Game1.toolHold + 20f) / 600f) + 1;
+                int powerupLevel = 3;
                 int x = (int)e.Cursor.AbsolutePixels.X;
                 int y = (int)e.Cursor.AbsolutePixels.Y;
                 int xtile = (int)x / Game1.tileSize;
@@ -67,6 +67,9 @@ namespace MultitoolMod
                 GameLocation location = Game1.player.currentLocation;
                 Vector2 tileVec = new Vector2(xtile, ytile);
                 multitool.DoFunction(Game1.currentLocation, x, y, powerupLevel, Game1.player);
+            }
+            else if ( e.Button == this.Config.CleanButton ){
+                multitool.cleanInventory(Game1.player);
             }
         }
     }

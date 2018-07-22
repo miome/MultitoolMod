@@ -18,6 +18,7 @@ using MultitoolMod;
 
 // TODO: Look at stardewvalley bash script, figure out command arguments and
 // env variables for mono, see if can launch from debugger.
+// TODO: Add Summaries and param desc to all functions
 
 
 namespace MultitoolMod.Framework
@@ -65,11 +66,6 @@ namespace MultitoolMod.Framework
 
         public override void DoFunction(GameLocation location, int x, int y, int power, Farmer who)
         {
-            /* TODO : Covert all try/catch on dictionary exceptions to this:
-             * if (dictionary.TryGetValue(key, out string value))
-             {
-                 // do stuff with value
-             } */
             this.Refresh_Tools();
             Tool tool;
             IDictionary<string, object> properties = this.Get_Properties(x, y);
@@ -129,12 +125,10 @@ namespace MultitoolMod.Framework
             }
             if (toolName == "melee")
             {
-                //this.scythe.DoDamage(Game1.currentLocation, x, y, Game1.player.facingDirection, power, who);
                 //TODO this doesn't land at the right location
-                this.scythe.DoDamage(Game1.currentLocation, x, y, 0, power, who);
-                //this.scythe.DoFunction(location, x, y, power, who);
+                //this.scythe.DoDamage(Game1.currentLocation, x, y, 0, power, who);
                 return;
-            }
+            } 
             else
             {
                 tool.DoFunction(location, x, y, power, who);
@@ -159,6 +153,8 @@ namespace MultitoolMod.Framework
                     else if (item is WateringCan w)
                     {
                         this.wateringCan.upgradeLevel.Set(w.upgradeLevel.Get());
+                        this.wateringCan.waterCanMax = w.waterCanMax;
+                        this.wateringCan.WaterLeft=w.WaterLeft;
 
                     }
                     else if (item is Hoe h)
@@ -186,25 +182,32 @@ namespace MultitoolMod.Framework
             {
                 this.mod.Monitor.Log("Error running checkAction, an item was not found in the Stardew dictionaries. " + System.Environment.NewLine +
                                     "This is most often seen when using items created with JsonAssets" + System.Environment.NewLine +
-                                     "Multitool will attempt to delete the items from player inventory to avoid a crash. The original exception was:" + e);
-                for (int i = 0; i < who.items.Count; i++)
-                {
-                    if (((NetList<Item, NetRef<Item>>)who.items)[i] != null)
-                    {
-                        try
-                        {
-                            string x = Game1.objectInformation[((NetList<Item, NetRef<Item>>)who.items)[i].ParentSheetIndex];
-                        }
-                        catch (System.Collections.Generic.KeyNotFoundException)
-                        {
-                            who.removeItemFromInventory(i);
-                        }
-                    }
-                }
+                                     "Multitool will attempt to delete the items from player inventory to avoid a crash. The original exception was:" + e, LogLevel.Warn);
+                cleanInventory(who);
 
             }
         }
 
+        public void cleanInventory(Farmer who){
+            this.mod.Monitor.Log("Multitool.cleanInventory called to check for invalid items in player inventory", LogLevel.Trace);
+            int count = 0;
+            for (int i = 0; i < who.items.Count; i++)
+            {
+                if (((NetList<Item, NetRef<Item>>)who.items)[i] != null)
+                {
+                    try
+                    {
+                        string x = Game1.objectInformation[((NetList<Item, NetRef<Item>>)who.items)[i].ParentSheetIndex];
+                    }
+                    catch (System.Collections.Generic.KeyNotFoundException)
+                    {
+                        who.removeItemFromInventory(i);
+                        count += 1;
+                    }
+                }
+            }
+            this.mod.Monitor.Log($"{count} bad items found & removed", LogLevel.Warn);
+        }
 
         public IDictionary<string, System.Object> Get_Properties(int x, int y)
         {
