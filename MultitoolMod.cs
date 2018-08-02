@@ -59,7 +59,7 @@ namespace MultitoolMod
             }
             else if (e.Button == this.Config.ToolButton)
             {
-                int powerupLevel = 3;
+                int powerupLevel = 1;
                 int x = (int)e.Cursor.AbsolutePixels.X;
                 int y = (int)e.Cursor.AbsolutePixels.Y;
                 int xtile = (int)x / Game1.tileSize;
