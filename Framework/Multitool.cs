@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Netcode;
@@ -168,46 +169,7 @@ namespace MultitoolMod.Framework
                 }
             }
         }
-        /*
-        public void checkAction(GameLocation parentL, Location childL, xTile.Dimensions.Rectangle viewport, Farmer who)
-        {
-            // This method is inserted to deal with the case where a harvest produces an invalid item.
-            // This is the statement that fails: int num7 = Convert.ToInt32 (Game1.objectInformation [this.indexOfHarvest].Split ('/') [1]);
-            // WARNING: Untested, bug has not re-occurred yet
-            try
-            {
-                parentL.checkAction(childL, viewport, who);
-            }
-            catch (System.Collections.Generic.KeyNotFoundException e)
-            {
-                this.mod.Monitor.Log("Error running checkAction, an item was not found in the Stardew dictionaries. " + System.Environment.NewLine +
-                                    "This is most often seen when using items created with JsonAssets" + System.Environment.NewLine +
-                                     "Multitool will attempt to delete the items from player inventory to avoid a crash. The original exception was:" + e, LogLevel.Warn);
-                cleanInventory(who);
 
-            }
-        }
-
-        public void cleanInventory(Farmer who){
-            this.mod.Monitor.Log("Multitool.cleanInventory called to check for invalid items in player inventory", LogLevel.Trace);
-            int count = 0;
-            for (int i = 0; i < who.items.Count; i++)
-            {
-                if (((NetList<Item, NetRef<Item>>)who.items)[i] != null)
-                {
-                    try
-                    {
-                        string x = Game1.objectInformation[((NetList<Item, NetRef<Item>>)who.items)[i].ParentSheetIndex];
-                    }
-                    catch (System.Collections.Generic.KeyNotFoundException)
-                    {
-                        who.removeItemFromInventory(i);
-                        count += 1;
-                    }
-                }
-            }
-            this.mod.Monitor.Log($"{count} bad items found & removed", LogLevel.Warn);
-        } */
 
         public IDictionary<string, System.Object> Get_Properties(int x, int y)
         {
@@ -426,21 +388,29 @@ namespace MultitoolMod.Framework
             }
             return formatted_output;
         }
+        /// This function provided by Protector
+        /// <summary>Get resource clumps in a given location.</summary>
+        /// <param name="location">The location to search.</param>
+        public IEnumerable<ResourceClump> GetResourceClumps(GameLocation location)
+        {
+            foreach (FieldInfo field in location.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                if (field.GetValue(location) is IEnumerable<ResourceClump> enumerable)
+                {
+                    foreach (ResourceClump resourceClump in enumerable)
+                    {
+                        if (resourceClump != null)
+                        {
+                            yield return resourceClump;
+                        }
+                    }
+                }
+            }
+
+        }
         ///The functions below are taking directly from Tractor Mod by PathosChild
         /// https://github.com/Pathoschild/StardewMods/tree/develop/TractorMod
 
-        /// <summary>Get resource clumps in a given location.</summary>
-        /// <param name="location">The location to search.</param>
-        protected IEnumerable<ResourceClump> GetResourceClumps(GameLocation location)
-        {
-            if (location is Farm farm)
-                return farm.resourceClumps;
-            if (location is Woods woods)
-                return woods.stumps;
-            if (location is MineShaft mineshaft)
-                return mineshaft.resourceClumps;
-            return new ResourceClump[0];
-        }
         /// <summary>Get the resource clump which covers a given tile, if any.</summary>
         /// <param name="location">The location to check.</param>
         /// <param name="tile">The tile to check.</param>
@@ -449,6 +419,7 @@ namespace MultitoolMod.Framework
             Rectangle tileArea = this.GetAbsoluteTileArea(tile);
             foreach (ResourceClump clump in this.GetResourceClumps(location))
             {
+                mod.Monitor.Log("Looking at a clump ...", LogLevel.Debug);
                 if (clump.getBoundingBox(clump.tile.Value).Intersects(tileArea))
                     return clump;
             }
