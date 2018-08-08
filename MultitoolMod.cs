@@ -53,8 +53,8 @@ namespace MultitoolMod
                 GameLocation location = Game1.player.currentLocation;
                 Vector2 tileVec = new Vector2(xtile, ytile);
                 IDictionary<String, System.Object> properties = multitool.Get_Properties(x, y);
-                string formattedProperties = multitool.Format_Properties(properties);
-                this.Monitor.Log($"At {x}/{y} found the following properties: {formattedProperties}");
+                string formattedProperties = $"At {x}/{y} (tile {xtile}/{ytile}) found the following properties: " + multitool.Format_Properties(properties);
+                this.Monitor.Log(formattedProperties);
                 Game1.addHUDMessage(new HUDMessage(formattedProperties));
             }
             else if (e.Button == this.Config.ToolButton)

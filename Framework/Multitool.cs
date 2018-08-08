@@ -303,7 +303,6 @@ namespace MultitoolMod.Framework
 
                     if (tileFeature is Tree tree)
                     {
-                        //TODO: use hoe on tree seeds
                         properties["string_useTool"] = (System.Object)"axe";
                         properties["bool_hasTree"] = (System.Object)true;
                     }
