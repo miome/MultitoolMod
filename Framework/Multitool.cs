@@ -389,6 +389,7 @@ namespace MultitoolMod.Framework
             return formatted_output;
         }
         /// This function provided by Protector
+        /// https://github.com/maxvollmer
         /// <summary>Get resource clumps in a given location.</summary>
         /// <param name="location">The location to search.</param>
         public IEnumerable<ResourceClump> GetResourceClumps(GameLocation location)
