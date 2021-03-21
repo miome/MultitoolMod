@@ -41,12 +41,15 @@ namespace MultitoolMod
                 return;
             if (e.Button == this.Config.InfoButton)
             {
+                multitool.cursor = e.Cursor;
                 int x = (int)e.Cursor.AbsolutePixels.X;
                 int y = (int)e.Cursor.AbsolutePixels.Y;
-                int xtile = (int)x / Game1.tileSize;
-                int ytile = (int)y / Game1.tileSize;
+                //int xtile = (int)x / Game1.tileSize;
+                //int ytile = (int)y / Game1.tileSize;
+                int xtile = (int)e.Cursor.Tile.X;
+                int ytile = (int)e.Cursor.Tile.Y;
                 GameLocation location = Game1.player.currentLocation;
-                Vector2 tileVec = new Vector2(xtile, ytile);
+                Vector2 tileVec = e.Cursor.Tile;
                 IDictionary<String, System.Object> properties = multitool.Get_Properties(x, y);
                 string formattedProperties = $"At {x}/{y} (tile {xtile}/{ytile}) found the following properties: " + multitool.Format_Properties(properties);
                 this.Monitor.Log(formattedProperties);
@@ -54,13 +57,16 @@ namespace MultitoolMod
             }
             else if (e.Button == this.Config.ToolButton)
             {
+                multitool.cursor = e.Cursor;
                 int powerupLevel = 1;
                 int x = (int)e.Cursor.AbsolutePixels.X;
                 int y = (int)e.Cursor.AbsolutePixels.Y;
-                int xtile = (int)x / Game1.tileSize;
-                int ytile = (int)y / Game1.tileSize;
+                //int xtile = (int)x / Game1.tileSize;
+                //int ytile = (int)y / Game1.tileSize;
+                int xtile = (int)e.Cursor.Tile.X;
+                int ytile = (int)e.Cursor.Tile.Y;
                 GameLocation location = Game1.player.currentLocation;
-                Vector2 tileVec = new Vector2(xtile, ytile);
+                Vector2 tileVec = e.Cursor.Tile;
                 multitool.DoFunction(Game1.currentLocation, x, y, powerupLevel, Game1.player);
             }
             // else if ( e.Button == this.Config.CleanButton ){

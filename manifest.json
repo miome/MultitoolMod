@@ -1,7 +1,7 @@
 ﻿{
   "Name": "MultitoolMod",
   "Author": "Miome",
-  "Version": "1.5.0",
+  "Version": "1.6.0",
   "Description": "A tool for every profession",
   "UniqueID": "miome.MultiToolMod",
   "EntryDll": "MultitoolMod.dll",
