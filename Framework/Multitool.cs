@@ -16,6 +16,7 @@ using StardewValley.Locations;
 using SObject = StardewValley.Object;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using MultitoolMod;
+using StardewValley.GameData.Crops;
 
 // TODO: Look at stardewvalley bash script, figure out command arguments and
 // env variables for mono, see if can launch from debugger.
@@ -41,7 +42,7 @@ namespace MultitoolMod.Framework
             this.attachedTools = new Dictionary<string, Tool>();
             this.axe = new Axe();
             this.pickaxe = new Pickaxe();
-            this.scythe = new MeleeWeapon(47);
+            this.scythe = new MeleeWeapon("47");
             this.scythe = (MeleeWeapon)this.scythe.getOne();
             this.scythe.Category = -99;
             this.wateringCan = new WateringCan();
@@ -87,13 +88,13 @@ namespace MultitoolMod.Framework
                             HoeDirt dirt = (HoeDirt)properties["hoedirt_dirt"];
                             if (Game1.player.CurrentItem.Category == StardewValley.Object.SeedsCategory)
                             {
-                                dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, false, Game1.currentLocation);
-                                Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
+                                dirt.plant(Game1.player.CurrentItem.QualifiedItemId, Game1.player, false);
+                                Game1.player.Items.ReduceId(Game1.player.CurrentItem.QualifiedItemId, 1);
                             }
                             else if (Game1.player.CurrentItem.Category == StardewValley.Object.fertilizerCategory)
                             {
-                                dirt.plant(Game1.player.CurrentItem.parentSheetIndex.Get(), xtile, ytile, Game1.player, true, Game1.currentLocation);
-                                Game1.player.consumeObject(Game1.player.CurrentItem.parentSheetIndex.Get(), 1);
+                                dirt.plant(Game1.player.CurrentItem.QualifiedItemId, Game1.player, true);
+                                Game1.player.Items.ReduceId(Game1.player.CurrentItem.QualifiedItemId, 1);
                             }
                         }
                         else
@@ -103,7 +104,7 @@ namespace MultitoolMod.Framework
                     }
                     catch (System.Collections.Generic.KeyNotFoundException)
                     {
-                        Game1.addHUDMessage(new HUDMessage($"{Game1.player.CurrentItem} {Game1.player.CurrentItem.parentSheetIndex.Get()} 201"));
+                        Game1.addHUDMessage(new HUDMessage($"{Game1.player.CurrentItem} {Game1.player.CurrentItem.QualifiedItemId} 201"));
                         return;
                     }
                 }
@@ -146,22 +147,22 @@ namespace MultitoolMod.Framework
                 {
                     if (item is Pickaxe p)
                     {
-                        this.pickaxe.upgradeLevel.Set(p.upgradeLevel.Get());
+                        this.pickaxe.UpgradeLevel=p.UpgradeLevel;
                     }
                     else if (item is Axe a)
                     {
-                        this.axe.upgradeLevel.Set(a.upgradeLevel.Get());
+                        this.axe.UpgradeLevel=a.UpgradeLevel;
                     }
                     else if (item is WateringCan w)
                     {
-                        this.wateringCan.upgradeLevel.Set(w.upgradeLevel.Get());
+                        this.wateringCan.UpgradeLevel=w.UpgradeLevel;
                         this.wateringCan.waterCanMax = w.waterCanMax;
                         this.wateringCan.WaterLeft=w.WaterLeft;
 
                     }
                     else if (item is Hoe h)
                     {
-                        this.hoe.upgradeLevel.Set(h.upgradeLevel.Get());
+                        this.hoe.UpgradeLevel=h.UpgradeLevel;
                     }
                     else if (((Tool)item).Name == "Scythe")
                     {
@@ -223,7 +224,7 @@ namespace MultitoolMod.Framework
             if ((bool)properties["bool_isResourceClump"])
             {
                 properties["ResourceClump_clump"] = (System.Object)clump;
-                switch (clump.parentSheetIndex)
+                switch (clump.parentSheetIndex.Get())
                 {
                     //TODO: Add large crops
                     case ResourceClump.boulderIndex:
@@ -277,7 +278,7 @@ namespace MultitoolMod.Framework
                 }
                 else if (tileObj is StardewValley.Objects.IndoorPot pot)
                 {
-                    properties = Get_HoeDirtProperties(pot.hoeDirt, properties);
+                    properties = Get_HoeDirtProperties(pot.hoeDirt.Get(), properties);
                 }
                 else if (tileObj.ParentSheetIndex == 590)
                 {
@@ -342,7 +343,7 @@ namespace MultitoolMod.Framework
                     properties["bool_fullyGrownCrop"] = (System.Object)canHarvestNow;
                     if (canHarvestNow)
                     {
-                        if (dirt.crop.harvestMethod.Value == Crop.sickleHarvest)
+                        if (dirt.crop.GetHarvestMethod() == HarvestMethod.Scythe )
                         {
                             properties["string_useTool"] = (System.Object)"melee";
                         }
@@ -420,7 +421,7 @@ namespace MultitoolMod.Framework
             Rectangle tileArea = this.GetAbsoluteTileArea(tile);
             foreach (ResourceClump clump in this.GetResourceClumps(location))
             {
-                if (clump.getBoundingBox(clump.tile.Value).Intersects(tileArea))
+                if (clump.getBoundingBox().Intersects(tileArea))
                     return clump;
             }
 
