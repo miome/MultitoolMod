@@ -1,7 +1,9 @@
 {
   "profiles": {
     "MultitoolMod": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "hotReloadEnabled": false,
+      "nativeDebugging": false
     }
   }
 }
