@@ -53,7 +53,7 @@ namespace MultitoolMod.Framework
             attachedTools["hoe"] = this.hoe;
         }
 
-        public override Item getOne()
+        protected override Item GetOneNew()
         {
             return new Multitool(null);
         }
