@@ -23,7 +23,24 @@ namespace MultitoolMod
         {
             this.Config = this.Helper.ReadConfig<ModConfig>();
             helper.Events.Input.ButtonsChanged += this.OnButtonsChanged;
-            this.multitool = new Multitool(this);
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
+            helper.Events.GameLoop.SaveCreated += this.OnSaveCreated;
+        }
+        private void initalizeMultitool()
+        {
+            if (this.multitool == null)
+            {
+                this.multitool = new Multitool(this);
+            }
+        }
+        private void OnSaveCreated(object sender, SaveCreatedEventArgs e)
+        {
+            initalizeMultitool();
+        }
+
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            initalizeMultitool();
         }
 
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
