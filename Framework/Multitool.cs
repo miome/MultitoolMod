@@ -88,13 +88,25 @@ namespace MultitoolMod.Framework
                             HoeDirt dirt = (HoeDirt)properties["hoedirt_dirt"];
                             if (Game1.player.CurrentItem.Category == StardewValley.Object.SeedsCategory)
                             {
-                                dirt.plant(Game1.player.CurrentItem.QualifiedItemId, Game1.player, false);
-                                Game1.player.Items.ReduceId(Game1.player.CurrentItem.QualifiedItemId, 1);
+                                if (dirt.plant(Game1.player.CurrentItem.ItemId, Game1.player, false))
+                                {
+                                    //Only take item if planting was successful
+                                    Game1.player.Items.ReduceId(Game1.player.CurrentItem.QualifiedItemId, 1);
+                                } else
+                                {
+                                    Game1.addHUDMessage(new HUDMessage($"{Game1.player.CurrentItem.DisplayName} can't be planted here."));
+                                }
                             }
                             else if (Game1.player.CurrentItem.Category == StardewValley.Object.fertilizerCategory)
                             {
-                                dirt.plant(Game1.player.CurrentItem.QualifiedItemId, Game1.player, true);
-                                Game1.player.Items.ReduceId(Game1.player.CurrentItem.QualifiedItemId, 1);
+                                if (dirt.plant(Game1.player.CurrentItem.ItemId, Game1.player, true))
+                                {
+                                    Game1.player.Items.ReduceId(Game1.player.CurrentItem.QualifiedItemId, 1);
+                                }
+                                else
+                                {
+                                    Game1.addHUDMessage(new HUDMessage($"{Game1.player.CurrentItem.DisplayName} can't be placed here."));
+                                }
                             }
                         }
                         else
