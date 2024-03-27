@@ -17,6 +17,8 @@ using SObject = StardewValley.Object;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using MultitoolMod;
 using StardewValley.GameData.Crops;
+using System.ComponentModel.Design;
+using static StardewValley.Minigames.CraneGame;
 
 // TODO: Look at stardewvalley bash script, figure out command arguments and
 // env variables for mono, see if can launch from debugger.
@@ -31,6 +33,7 @@ namespace MultitoolMod.Framework
         public Pickaxe pickaxe;
         public MeleeWeapon scythe;
         public WateringCan wateringCan;
+        public MeleeWeapon meleeWeapon;
         public Hoe hoe;
         public IDictionary<string, Tool> attachedTools;
         public MultitoolMod mod;
@@ -44,14 +47,16 @@ namespace MultitoolMod.Framework
             this.pickaxe = new Pickaxe();
             this.scythe = new MeleeWeapon("47");
             this.scythe = (MeleeWeapon)this.scythe.getOne();
+            this.meleeWeapon = this.scythe;
             this.scythe.Category = -99;
             this.wateringCan = new WateringCan();
             this.hoe = new Hoe();
             attachedTools["axe"] = this.axe;
             attachedTools["pickaxe"] = this.pickaxe;
-            attachedTools["melee"] = this.scythe;
+            attachedTools["scythe"] = this.scythe;
             attachedTools["wateringcan"] = this.wateringCan;
             attachedTools["hoe"] = this.hoe;
+            attachedTools["meleeWeapon"]=this.meleeWeapon;
         }
 
         protected override Item GetOneNew()
@@ -138,12 +143,55 @@ namespace MultitoolMod.Framework
                 }
                 return;
             }
-            if (toolName == "melee")
+            if (toolName == "scythe")
             {
-                //TODO this doesn't land at the right location
-                //this.scythe.DoDamage(Game1.currentLocation, x, y, 0, power, who);
-                return;
-            } 
+                //this.scythe.DoDamage(location, x, y, who.FacingDirection, 1, who);
+                /*Vector2 vector = new Vector2(x,y);
+                Vector2 tileLocation = Vector2.Zero;
+                Vector2 tileLocation2 = Vector2.Zero;
+                Rectangle boundingBox = new Rectangle((int)vector.X + 8, (int)vector.Y + who.FarmerSprite.getHeight() - 32, 48, 32);
+                Rectangle areaOfEffect = this.scythe.getAreaOfEffect(x, y, who.FacingDirection, ref tileLocation, ref tileLocation2, who.GetBoundingBox(), who.FarmerSprite.currentAnimationIndex);
+                foreach (Vector2 item in Utility.removeDuplicates(Utility.getListOfTileLocationsForBordersOfNonTileRectangle(areaOfEffect)))
+                {
+                    if (location.terrainFeatures.TryGetValue(item, out var value) && value.performToolAction(this, 0, item))
+                    {
+                        location.terrainFeatures.Remove(item);
+                    }
+
+                    if (location.objects.TryGetValue(item, out var value2) && value2.performToolAction(this))
+                    {
+                        location.objects.Remove(item);
+                    }
+
+                    if (location.performToolAction(this, (int)item.X, (int)item.Y))
+                    {
+                        break;
+                    }
+                }*/
+                    
+                    if ((bool)properties["bool_fullyGrownCrop"] || (bool)properties["bool_hasDeadCrop"])
+                    {
+
+                        HoeDirt dirt = (HoeDirt)properties["hoedirt_dirt"];
+                        who.playNearbySoundLocal("swordswipe");
+                        dirt.performToolAction(this.scythe, 1, new Vector2(xtile, ytile));
+                        return;
+                    }
+                    if ((bool)properties["bool_isWeed"])
+                    {
+                        SObject weed = (SObject)properties["obj_tileObj"];
+                        who.playNearbySoundLocal("swordswipe");
+                        weed.performToolAction(this.scythe);
+                        return;
+                    }
+                    /* This technically works but does barely anything.  Leaving grass unsupported for now. 
+                    if ((bool)properties["bool_hasGrass"])
+                    {
+                        Grass grass = (Grass)properties["grass_Grass"];
+                        grass.performToolAction(this.scythe, 0, new Vector2(xtile, ytile));
+                        return;
+                    }*/
+                }
             else
             {
                 tool.DoFunction(location, x, y, power, who);
@@ -159,26 +207,33 @@ namespace MultitoolMod.Framework
                 {
                     if (item is Pickaxe p)
                     {
-                        this.pickaxe.UpgradeLevel=p.UpgradeLevel;
+                        this.pickaxe.UpgradeLevel = p.UpgradeLevel;
                     }
                     else if (item is Axe a)
                     {
-                        this.axe.UpgradeLevel=a.UpgradeLevel;
+                        this.axe.UpgradeLevel = a.UpgradeLevel;
                     }
                     else if (item is WateringCan w)
                     {
-                        this.wateringCan.UpgradeLevel=w.UpgradeLevel;
+                        this.wateringCan.UpgradeLevel = w.UpgradeLevel;
                         this.wateringCan.waterCanMax = w.waterCanMax;
-                        this.wateringCan.WaterLeft=w.WaterLeft;
+                        this.wateringCan.WaterLeft = w.WaterLeft;
 
                     }
                     else if (item is Hoe h)
                     {
-                        this.hoe.UpgradeLevel=h.UpgradeLevel;
+                        this.hoe.UpgradeLevel = h.UpgradeLevel;
                     }
-                    else if (((Tool)item).Name == "Scythe")
+                    else if (item is MeleeWeapon m)
                     {
-                        this.scythe = (MeleeWeapon)item;
+                        if (m.isScythe())
+                        {
+                            this.scythe = m;
+                        }
+                        else if (m.minDamage.Get() > this.meleeWeapon.minDamage.Get())
+                        {
+                            this.meleeWeapon = m;
+                        }
                     }
                 }
             }
@@ -215,6 +270,8 @@ namespace MultitoolMod.Framework
                 {"string_tileObjName", null},
                 {"string_useTool", null},
                 {"type_tileObjType", null},
+                {"crop_liveCrop", null},
+                {"grass_Grass", null }
             };
 
             int xtile = (int)x / Game1.tileSize;
@@ -279,7 +336,7 @@ namespace MultitoolMod.Framework
                 }
                 else if (tileObj.Name.ToLower().Contains("weed"))
                 {
-                    properties["string_useTool"] = (System.Object)"melee";
+                    properties["string_useTool"] = (System.Object)"scythe";
                     properties["bool_isWeed"] = (System.Object)true;
                     properties["bool_isDirt"] = (System.Object)false;
                 }
@@ -322,8 +379,9 @@ namespace MultitoolMod.Framework
                     }
                     else if (tileFeature is Grass grass)
                     {
-                        properties["string_useTool"] = (System.Object)"melee";
+                        properties["string_useTool"] = (System.Object)"scythe";
                         properties["bool_hasGrass"] = (System.Object)true;
+                        properties["grass_Grass"] = grass;
                     }
                 }
             }
@@ -341,11 +399,12 @@ namespace MultitoolMod.Framework
             properties["hoedirt_dirt"] = dirt;
             if (dirt.crop != null)
             {
+                properties["crop_Crop"]= (System.Object)dirt.crop;
                 if (dirt.crop.dead.Get())
                 {
                     properties["bool_hasDeadCrop"] = (System.Object)true;
                     properties["bool_hasLiveLCrop"] = (System.Object)false;
-                    properties["string_useTool"] = (System.Object)"melee";
+                    properties["string_useTool"] = (System.Object)"scythe";
                 }
                 else
                 {
@@ -357,7 +416,7 @@ namespace MultitoolMod.Framework
                     {
                         if (dirt.crop.GetHarvestMethod() == HarvestMethod.Scythe )
                         {
-                            properties["string_useTool"] = (System.Object)"melee";
+                            properties["string_useTool"] = (System.Object)"scythe";
                         }
                         else
                         {
