@@ -7,6 +7,5 @@ namespace MultitoolMod
     {
         public KeybindList ToolButton { get; set; } = KeybindList.ForSingle(SButton.Q);
         public KeybindList InfoButton { get; set; } = KeybindList.ForSingle(SButton.N);
-        public KeybindList CleanButton { get; set; } = KeybindList.ForSingle(SButton.C);
     }
 }
