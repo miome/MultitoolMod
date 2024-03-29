@@ -62,7 +62,7 @@ namespace MultitoolMod
                 Vector2 tileVec = e.Cursor.Tile;
                 IDictionary<String, System.Object> properties = multitool.Get_Properties(x, y);
                 string formattedProperties = $"At {x}/{y} (tile {xtile}/{ytile}) found the following properties: " + multitool.Format_Properties(properties);
-                this.Monitor.Log(formattedProperties);
+                this.Monitor.Log(formattedProperties,LogLevel.Info);
                 Game1.addHUDMessage(new HUDMessage(formattedProperties));
             }
             else if (this.Config.ToolButton.JustPressed())
