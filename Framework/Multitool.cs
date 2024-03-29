@@ -19,6 +19,9 @@ using MultitoolMod;
 using StardewValley.GameData.Crops;
 using System.ComponentModel.Design;
 using static StardewValley.Minigames.CraneGame;
+using StardewValley.Monsters;
+using System.Linq;
+using StardewValley.Objects;
 
 // TODO: Look at stardewvalley bash script, figure out command arguments and
 // env variables for mono, see if can launch from debugger.
@@ -27,7 +30,7 @@ using static StardewValley.Minigames.CraneGame;
 
 namespace MultitoolMod.Framework
 {
-    public class Multitool : Tool
+    public class Multitool : MeleeWeapon
     {
         public Axe axe;
         public Pickaxe pickaxe;
@@ -36,27 +39,33 @@ namespace MultitoolMod.Framework
         public MeleeWeapon meleeWeapon;
         public Hoe hoe;
         public IDictionary<string, Tool> attachedTools;
+        public IDictionary<string, int> toolIndex;
         public MultitoolMod mod;
+        public bool selfDefense;
         public ICursorPosition cursor;
 
-        public Multitool(MultitoolMod m)
+        public Multitool(MultitoolMod m, bool bool_SelfDefense = true) : base(defaultWeapon)
         {
             this.mod = m;
+            this.selfDefense = bool_SelfDefense;
             this.attachedTools = new Dictionary<string, Tool>();
-            this.axe = new Axe();
-            this.pickaxe = new Pickaxe();
-            this.scythe = new MeleeWeapon("47");
-            this.scythe = (MeleeWeapon)this.scythe.getOne();
-            this.meleeWeapon = this.scythe;
-            this.scythe.Category = -99;
-            this.wateringCan = new WateringCan();
-            this.hoe = new Hoe();
-            attachedTools["axe"] = this.axe;
-            attachedTools["pickaxe"] = this.pickaxe;
-            attachedTools["scythe"] = this.scythe;
-            attachedTools["wateringcan"] = this.wateringCan;
-            attachedTools["hoe"] = this.hoe;
-            attachedTools["meleeWeapon"]=this.meleeWeapon;
+             this.toolIndex = new Dictionary<string, int>();
+            this.Axe = new Axe();
+            this.Pickaxe = new Pickaxe();
+            this.Scythe = new MeleeWeapon("47");
+            this.Scythe = (MeleeWeapon)this.Scythe.getOne();
+
+            this.MeleeWeapon = new MeleeWeapon(defaultWeapon);
+
+            this.Scythe.Category = -99;
+            this.WateringCan = new WateringCan();
+            this.Hoe = new Hoe();
+            attachedTools["Axe"] = this.Axe;
+            attachedTools["Pickaxe"] = this.Pickaxe;
+            attachedTools["Scythe"] = this.Scythe;
+            attachedTools["WateringCan"] = this.WateringCan;
+            attachedTools["Hoe"] = this.Hoe;
+            attachedTools["MeleeWeapon"] = this.MeleeWeapon;
         }
 
         protected override Item GetOneNew()
@@ -72,9 +81,49 @@ namespace MultitoolMod.Framework
             return Game1.content.LoadString("A tool for all trades");
         }
 
+        public bool swapIn(string toolName)
+        {
+            Farmer who = Game1.player;
+            if(who.CurrentTool != null && who.CurrentTool.GetType().Name == toolName) { return true;  }
+            int i = -1;
+            try
+            {
+                i = this.toolIndex[toolName];
+            } catch (KeyNotFoundException) { return false;  }
+            who.CurrentToolIndex = i;
+            return true;
+        }
+
         public override void DoFunction(GameLocation location, int x, int y, int power, Farmer who)
         {
             this.Refresh_Tools();
+            if (selfDefense)
+            {
+                Monster monster = Utility.findClosestMonsterWithinRange(location, who.getStandingPosition(), 500, ignoreUntargetables: true);
+                if (monster != null && !monster.Name.Equals("Truffle Crab"))
+                {
+                    float distance = Vector2.Distance(monster.Tile, who.Tile);
+                    Vector2 tileLocation = Vector2.Zero;
+                    Vector2 tileLocation2 = Vector2.Zero;
+                    Rectangle areaOfEffect;
+                    int facingDirection = who.getGeneralDirectionTowards(monster.Position);
+                    mod.Monitor.Log(string.Format("Monster {0} found at {1}, distance in tiles {2}", monster.Name, monster.Position, distance), LogLevel.Error);
+                    mod.Monitor.Log(string.Format("Farmer at {0}, facing direction {1}", who.Position, who.FacingDirection), LogLevel.Error);
+                    if (distance < 1.5)
+                    {
+                        bool hasAWeapon = this.swapIn("MeleeWeapon");
+                        if (!hasAWeapon)
+                        {
+                            Game1.player.addItemByMenuIfNecessary((Item)this);
+                        }
+                        //These three commands animate the farmer, the tool, and trigger the tool effects
+                        ((MeleeWeapon)this.attachedTools["MeleeWeapon"]).setFarmerAnimating(who);
+                        who.UsingTool = true;
+                        Game1.player.FireTool();
+                        return;
+                    }
+                }
+            }
             Tool tool;
             IDictionary<string, object> properties = this.Get_Properties(x, y);
             string toolName = "";
@@ -459,6 +508,10 @@ namespace MultitoolMod.Framework
                 }
             }
             return formatted_output;
+        }
+        public override void DoDamage(GameLocation location, int x, int y, int facingDirection, int power, Farmer who)
+        {
+            ((MeleeWeapon)this.attachedTools["MeleeWeapon"]).DoDamage(location, x, y, facingDirection, power, who);
         }
         /// This function provided by Protector
         /// https://github.com/maxvollmer

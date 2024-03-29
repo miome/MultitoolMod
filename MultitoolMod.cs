@@ -30,7 +30,7 @@ namespace MultitoolMod
         {
             if (this.multitool == null)
             {
-                this.multitool = new Multitool(this);
+                this.multitool = new Multitool(this, this.Config.selfDefense);
             }
         }
         private void OnSaveCreated(object sender, SaveCreatedEventArgs e)
