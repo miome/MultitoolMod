@@ -1,6 +1,10 @@
 {
   "profiles": {
-    "MultitoolMod": {
+    "Debug": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    },
+    "Release": {
       "commandName": "Project",
       "hotReloadEnabled": false,
       "nativeDebugging": false
