@@ -380,7 +380,7 @@ foreach (Vector2 item in Utility.removeDuplicates(Utility.getListOfTileLocations
             properties["hoedirt_dirt"] = dirt;
             if (dirt.crop != null)
             {
-                properties["crop_Crop"]= (System.Object)dirt.crop;
+                properties["crop_Crop"] = (System.Object)dirt.crop;
                 if (dirt.crop.dead.Get())
                 {
                     properties["bool_hasDeadCrop"] = (System.Object)true;
