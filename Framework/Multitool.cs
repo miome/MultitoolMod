@@ -20,8 +20,6 @@ using StardewValley.GameData.Crops;
 using System.ComponentModel.Design;
 using static StardewValley.Minigames.CraneGame;
 
-// TODO: Look at stardewvalley bash script, figure out command arguments and
-// env variables for mono, see if can launch from debugger.
 // TODO: Add Summaries and param desc to all functions
 
 
