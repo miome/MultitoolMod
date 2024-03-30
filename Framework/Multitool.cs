@@ -17,6 +17,8 @@ using SObject = StardewValley.Object;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using MultitoolMod;
 using StardewValley.GameData.Crops;
+using System.ComponentModel.Design;
+using static StardewValley.Minigames.CraneGame;
 
 // TODO: Look at stardewvalley bash script, figure out command arguments and
 // env variables for mono, see if can launch from debugger.
@@ -129,7 +131,6 @@ namespace MultitoolMod.Framework
                 }
                 return;
             }
-
             if (toolName == "scythe")
             {
                 MeleeWeapon scythe = (MeleeWeapon)attachedTools["scythe"];
@@ -252,6 +253,8 @@ foreach (Vector2 item in Utility.removeDuplicates(Utility.getListOfTileLocations
                 {"string_tileObjName", null},
                 {"string_useTool", null},
                 {"type_tileObjType", null},
+                {"crop_liveCrop", null},
+                {"grass_Grass", null }
             };
 
             int xtile = (int)x / Game1.tileSize;
@@ -361,6 +364,7 @@ foreach (Vector2 item in Utility.removeDuplicates(Utility.getListOfTileLocations
                     {
                         properties["string_useTool"] = (System.Object)"scythe";
                         properties["bool_hasGrass"] = (System.Object)true;
+                        properties["grass_Grass"] = grass;
                     }
                 }
             }
@@ -378,6 +382,7 @@ foreach (Vector2 item in Utility.removeDuplicates(Utility.getListOfTileLocations
             properties["hoedirt_dirt"] = dirt;
             if (dirt.crop != null)
             {
+                properties["crop_Crop"]= (System.Object)dirt.crop;
                 if (dirt.crop.dead.Get())
                 {
                     properties["bool_hasDeadCrop"] = (System.Object)true;
